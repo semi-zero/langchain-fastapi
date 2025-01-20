@@ -30,7 +30,7 @@ async def create_answering_chain(llm, query, history):
     #     "runName": "StreamingLLM"
     # })
     streaming_llm = RunnableLambda(lambda _: ChatOllama(
-        model="phi3:latest",
+        model="gemma:2b",
         base_url='http://localhost:11434',
         streaming=True,
         callbacks=[callback],
@@ -91,6 +91,7 @@ async def create_answering_chain(llm, query, history):
 
     async def stream_response():
         try:
+
             async for chunk in callback.aiter():
                 print(chunk) #유용함
                 content = chunk if isinstance(chunk, str) else chunk.content
@@ -135,3 +136,29 @@ async def chat(request: Request):
         temperature=0
     )
     return await create_answering_chain(llm, query, formatted_history)
+
+
+@router.post("/chat/docs")
+async def get_docs(request: Request):
+    data = await request.json()
+    query = data.get("message", "")
+    
+    # 가짜 문서 데이터 생성
+    mock_docs = [
+        {
+            "pageContent": "가짜 문서 내용 1",
+            "metadata": {
+                "title": "테스트 문서 1",
+                "url": "http://example.com/1"
+            }
+        },
+        {
+            "pageContent": "가짜 문서 내용 2",
+            "metadata": {
+                "title": "테스트 문서 2",
+                "url": "http://example.com/2"
+            }
+        }
+    ]
+    
+    return mock_docs
