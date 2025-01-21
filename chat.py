@@ -161,4 +161,7 @@ async def get_docs(request: Request):
         }
     ]
     
-    return mock_docs
+    return {
+        "docs": mock_docs,
+        "sql_query": "SELECT * FROM test_table"  # 예시 SQL 쿼리
+    }
