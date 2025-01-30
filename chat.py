@@ -15,7 +15,7 @@ import json
 
 router = APIRouter()
 
-async def create_answering_chain(llm, query, history):
+async def create_answering_chain(query, history):
     # 콜백 핸들러 설정
     callback = AsyncIteratorCallbackHandler()
     
@@ -31,7 +31,8 @@ async def create_answering_chain(llm, query, history):
     # })
     streaming_llm = RunnableLambda(lambda _: ChatOllama(
         model="gemma:2b",
-        base_url='http://localhost:11434',
+        # base_url='http://localhost:11434', local_experiment
+        base_url='http://ollama:11434', 
         streaming=True,
         callbacks=[callback],
         temperature=0
@@ -129,13 +130,13 @@ async def chat(request: Request):
             elif msg["role"] == "assistant":
                 formatted_history.append(SystemMessage(content=msg["content"]))
 
-    llm = ChatOllama(
-        model="phi3:latest",
-        base_url='http://localhost:11434',
-        streaming=True,
-        temperature=0
-    )
-    return await create_answering_chain(llm, query, formatted_history)
+    # llm = ChatOllama(
+    #     model="phi3:latest",
+    #     base_url='http://localhost:11434',
+    #     streaming=True,
+    #     temperature=0
+    # )
+    return await create_answering_chain(query, formatted_history)
 
 
 @router.post("/chat/docs")
