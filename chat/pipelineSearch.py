@@ -13,6 +13,13 @@ import datetime
 import asyncio
 import json
 
+
+import os
+os.environ["NO_PROXY"] = "*"
+
+LLM_MODEL = "qwen2.5:1.5b"
+LLM_URL = "http://localhost:11434"
+
 router = APIRouter()
 
 async def create_answering_chain(query, history):
@@ -30,9 +37,9 @@ async def create_answering_chain(query, history):
     #     "runName": "StreamingLLM"
     # })
     streaming_llm = RunnableLambda(lambda _: ChatOllama(
-        model="gemma:2b",
+        model=LLM_MODEL,
         # local_experiment
-        base_url='http://localhost:11434', 
+        base_url=LLM_URL, 
         #base_url='http://ollama:11434', 
         streaming=True,
         callbacks=[callback],
@@ -106,7 +113,7 @@ async def create_answering_chain(query, history):
                 }) + "\n"
             
             # 스트림 종료 시그널
-            yield json.dumps({"type": "end"}) + "\n"
+            # yield json.dumps({"type": "end"}) + "\n"
         except Exception as e:
             print(f"Streaming error: {e}")
         finally:
