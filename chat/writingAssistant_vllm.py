@@ -27,12 +27,9 @@ from io import BytesIO
 import os
 os.environ["NO_PROXY"] = "*"
 
-LLM_MODEL = "qwen2.5:1.5b"
-#local_experiment
-#LLM_URL = "http://localhost:11434"
-LLM_URL = "http://ollama:11434"
-
 router = APIRouter()
+openai_api_key = "EMPTY"
+openai_api_base = "http://localhost:8800/v1"
 
 async def create_answering_chain(query,
                                 history,
@@ -42,18 +39,16 @@ async def create_answering_chain(query,
     #콜백 핸들러 설정
     callback = AsyncIteratorCallbackHandler()
 
-    streaming_llm = RunnableLambda(lambda _: ChatOllama(
-        model = LLM_MODEL,
-        base_url = LLM_URL,
+    streaming_llm = RunnableLambda(lambda _: ChatOpenAI(
+        model = "/mnt/model/",
+        api_key = openai_api_key,
+        base_url = openai_api_base,
         streaming = True,
         callbacks = [callback],
-        keep_alive = -1
+        #keep_alive = -1
     )).with_config({
         "runName": "StreamingLLM"
     })
-
-    print(f"LLM_MODEL: {LLM_MODEL}")
-    print(f"LLM_URL: {LLM_URL}")
 
     #프롬프트 템플릿 설정
     prompt = ChatPromptTemplate.from_messages([
@@ -135,3 +130,20 @@ async def chat(request: Request):
                                         focusMode,
                                         optimizationMode,
                                         extraMessage)
+
+
+# pip install vll==0.5.0
+
+# Docker run -d -name vllm \
+# --gpus all \
+# -v /home/semizero/vllm/Qwen2.5-1.5B-Instruct/:/mnt/model \
+# -p 8800:8000 \
+# --env "TRANSFORMERS_OFFLINE=1" \
+# --env "HF_DATASET_OFFLINE=1" \
+# --ipc=host vllm/vllm-openai:latest \
+# --model="/mnt/model/"
+# --gpu-memory-utilization 0.8
+
+# curl -X POST "http://localhost:8000/v1/completions" \
+# -H "Content-Type: appllication/json" \
+# -d '{"prompt" : "Hello, AI!", "max_tokens":100, proxies = {'https':"", 'https':""}}'

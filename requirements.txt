@@ -83,6 +83,7 @@ duckduckgo-search~=6.2.11
 ##추가
 asyncio
 minio
+#vllm==0.5.0
 
 ## Tests
 docker~=7.1.0

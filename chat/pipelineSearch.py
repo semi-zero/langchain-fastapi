@@ -18,7 +18,9 @@ import os
 os.environ["NO_PROXY"] = "*"
 
 LLM_MODEL = "qwen2.5:1.5b"
-LLM_URL = "http://localhost:11434"
+#local_experiment
+#LLM_URL = "http://localhost:11434"
+LLM_URL = "http://ollama:11434"
 
 router = APIRouter()
 
@@ -38,9 +40,7 @@ async def create_answering_chain(query, history):
     # })
     streaming_llm = RunnableLambda(lambda _: ChatOllama(
         model=LLM_MODEL,
-        # local_experiment
         base_url=LLM_URL, 
-        #base_url='http://ollama:11434', 
         streaming=True,
         callbacks=[callback],
         temperature=0
