@@ -19,8 +19,8 @@ os.environ["NO_PROXY"] = "*"
 
 LLM_MODEL = "qwen2.5:1.5b"
 #local_experiment
-#LLM_URL = "http://localhost:11434"
-LLM_URL = "http://ollama:11434"
+LLM_URL = "http://localhost:11434"
+#LLM_URL = "http://ollama:11434"
 
 router = APIRouter()
 
